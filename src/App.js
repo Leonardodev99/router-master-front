@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import LoadingScreen from "./components/LoadingScreen";
 import LoginScreen from "./components/LoginScreen";
 import HomeScreen from "./components/HomeScreen";
+import SignupScreen from "./components/SignupScreen";
+import RecoverAccountScreen from "./components/RecoverAccountScreen";
 
 function App() {
   const [routeInfo, setRouteInfo] = useState({
@@ -12,6 +14,7 @@ function App() {
   
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentScreen, setCurrentScreen] = useState("login");
 
   // Função chamada quando a tela de carregamento finaliza
   const handleLoaded = () => {
@@ -23,14 +26,26 @@ function App() {
     setIsLoggedIn(true);
   };
 
+  const handleSignup = () => {
+    setCurrentScreen("login");
+  }
+
   return (
     <div className="App">
       {/* Tela de carregamento */}
       {isLoading ? (
         <LoadingScreen onLoaded={handleLoaded} />
-      ) : !isLoggedIn ? (
-        <LoginScreen onLogin={handleLogin} />
-      ) : (
+      ) : currentScreen === "login" && !isLoggedIn ? (
+        <LoginScreen 
+        onLogin={handleLogin}
+        onNavigateToSignup={() => setCurrentScreen('signup')}
+        onNavigateToRecover={() => setCurrentScreen("recover")} 
+        />
+      ) : currentScreen === "signup" ? (
+        <SignupScreen onSignup={handleSignup}/>
+      ) : currentScreen === "recover" ? (
+        <RecoverAccountScreen onRecover={(email) => alert(`Instruções enviadas para: ${email}`)}/>
+      ): (
         /* Tela principal após o login */
         <div>
           <HomeScreen routeInfo={routeInfo} setRouteInfo={setRouteInfo} />
