@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Polyline, useMapEvents } from "react-l
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "../styles/Map.css";
+import axios from "axios"; // Para chamadas HTTP
 
 // Configurar ícones do Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -20,6 +21,7 @@ function Map({ setRouteInfo, isWalkingStarted, onPositionChange, currentPosition
   const [currentSimulatedPosition, setCurrentSimulatedPosition] = useState(currentPosition); // Posição simulada do dispositivo
   const [mapCenter, setMapCenter] = useState([-8.8383, 13.2344]); // Coordenadas padrão (Luanda)
   const [routeIndex, setRouteIndex] = useState(0); // Índice da posição atual na rota
+  const [heatmapPoints, setHeatmapPoints] = useState([]); // Armazena os pontos do heatmap
 
   // Captura a localização atual automaticamente ao carregar o componente (origem)
   useEffect(() => {
@@ -43,6 +45,27 @@ function Map({ setRouteInfo, isWalkingStarted, onPositionChange, currentPosition
     }
   }, [setRouteInfo]);
 
+  // Captura a localização contínua durante a caminhada e atualiza o heatmap
+  useEffect(() => {
+    if (isWalkingStarted) {
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const newPosition = [latitude, longitude];
+
+          setCurrentDevicePosition(newPosition); // Atualiza a posição do dispositivo
+          onPositionChange(newPosition); // Envia a nova posição para o componente pai
+
+          // Adiciona a nova posição ao heatmap
+          setHeatmapPoints((prevPoints) => [...prevPoints, [...newPosition, 1]]); // [latitude, longitude, intensidade]
+        },
+        (error) => console.error("Erro na geolocalização:", error),
+        { enableHighAccuracy: true }
+      );
+      return () => navigator.geolocation.clearWatch(watchId); // Limpa o watch quando parar
+    }
+  }, [isWalkingStarted, onPositionChange]);
+
   // Função para lidar com o clique no mapa para selecionar o destino
   function handleMapClick(e) {
     const { lat, lng } = e.latlng;
@@ -65,7 +88,7 @@ function Map({ setRouteInfo, isWalkingStarted, onPositionChange, currentPosition
   }
 
   // Atualiza `routeInfo` e a rota quando a origem e o destino são definidos
-  useEffect(() => {
+ /* useEffect(() => {
     if (markers.start && markers.end) {
       setRouteInfo({ start: markers.start, end: markers.end });
        // Cria uma rota com mais pontos usando a função `createRoute`
@@ -73,7 +96,39 @@ function Map({ setRouteInfo, isWalkingStarted, onPositionChange, currentPosition
        setPolyline(detailedRoute);
        setRouteIndex(0); // Reseta o índice ao criar uma nova rota
     }
+  }, [markers, setRouteInfo]);*/
+
+  // Atualiza a rota quando origem e destino são definidos
+  useEffect(() => {
+    if (markers.start && markers.end) {
+      setRouteInfo({ start: markers.start, end: markers.end });
+      fetchRoute(markers.start, markers.end); // Busca a rota detalhada
+    }
   }, [markers, setRouteInfo]);
+
+  // Busca a rota detalhada usando a OpenRouteService API
+  const fetchRoute = async (start, end) => {
+    try {
+      const apiKey = "5b3ce3597851110001cf6248cdea24e743e74caea72a6f55686eb609"; // Substitua pela sua chave de API da OpenRouteService
+      const response = await axios.get(
+        `https://api.openrouteservice.org/v2/directions/foot-walking`,
+        {
+          params: {
+            api_key: apiKey,
+            start: `${start[1]},${start[0]}`, // Longitude, Latitude
+            end: `${end[1]},${end[0]}`,     // Longitude, Latitude
+          },
+        }
+      );
+
+      const coordinates = response.data.features[0].geometry.coordinates;
+      const route = coordinates.map(([lng, lat]) => [lat, lng]); // Converter para formato [lat, lng]
+      setPolyline(route); // Atualiza a rota no mapa
+      setRouteIndex(0); // Reseta o índice
+    } catch (error) {
+      console.error("Erro ao buscar a rota:", error);
+    }
+  };
 
 
 
@@ -115,45 +170,42 @@ function Map({ setRouteInfo, isWalkingStarted, onPositionChange, currentPosition
 }, [isWalkingStarted, polyline, onPositionChange, routeIndex]);
   
 
-  return (
-    <div className="map-container">
-      <MapContainer
-        center={mapCenter} // Centraliza no local atual do usuário
-        zoom={13}
-        style={{ height: "100%", width: "100%" }}
-        scrollWheelZoom={true}
-        whenCreated={(map) => {
-          map.on('click', handleMapClick); // Captura o clique para selecionar o destino
-        }}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        />
+return (
+  <div className="map-container">
+    <MapContainer
+      center={currentPosition || [-8.8383, 13.2344]} // Centraliza no local atual ou padrão
+      zoom={13}
+      style={{ height: "100%", width: "100%" }}
+      scrollWheelZoom={true}
+    >
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      />
 
-         {/* Componente para selecionar o destino ao clicar no mapa */}
-         <DestinationSelector />
-        
-        
-        {/* Exibe o marcador de origem capturada automaticamente */}
-        {markers.start && <Marker position={markers.start} icon={new L.Icon.Default()} />}
+      {/* Selecionador de destino */}
+      <DestinationSelector />
 
-        {/* Exibe o marcador de destino selecionado pelo usuário */}
-        {markers.end && <Marker position={markers.end} icon={new L.Icon.Default()} />}
+      {/* Marcadores e rota */}
+      {markers.start && <Marker position={markers.start} icon={new L.Icon.Default()} />}
+      {markers.end && <Marker position={markers.end} icon={new L.Icon.Default()} />}
+      {polyline.length > 0 && <Polyline positions={polyline} color="red" weight={4} />}
 
-        {/* Desenha a rota se houver origem e destino */}
-        {polyline.length > 0 && <Polyline positions={polyline} color="red" weight={4} />}
+      {/* Posição simulada */}
+      {currentSimulatedPosition && <Marker position={currentSimulatedPosition} />}
 
-        {/* Seta indicando a posição simulada do usuário durante a caminhada */}
-        {currentSimulatedPosition && (
-          <Marker position={currentSimulatedPosition} icon={new L.Icon.Default()}>
-            <span className="direction-arrow">→</span>
-          </Marker>
-
+      {/* Heatmap Layer */}
+      {heatmapPoints.length > 0 && (
+          <HeatmapLayer
+            points={heatmapPoints}
+            radius={25}
+            blur={15}
+            maxZoom={17}
+          />
         )}
-      </MapContainer>
-    </div>
-  );
+    </MapContainer>
+  </div>
+);
 }
 
  // Função para criar uma rota com mais pontos entre duas coordenadas
@@ -165,6 +217,21 @@ function Map({ setRouteInfo, isWalkingStarted, onPositionChange, currentPosition
     route.push([lat, lng]);
   }
   return route;
+}
+
+// Componente do HeatmapLayer
+function HeatmapLayer({ points, radius, blur, maxZoom }) {
+  const map = useMapEvents({});
+
+  useEffect(() => {
+    const heatLayer = L.heatLayer(points, { radius, blur, maxZoom }).addTo(map);
+
+    return () => {
+      map.removeLayer(heatLayer);
+    };
+  }, [map, points, radius, blur, maxZoom]);
+
+  return null;
 }
 
 export default Map;

@@ -15,11 +15,12 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
 
   useEffect(() => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
+      navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setCurrentPosition([latitude, longitude]); // Define a origem automaticamente
-          setRouteInfo((prev) => ({ ...prev, start: [latitude, longitude] })); // Atualiza a origem no routeInfo
+          const newPosition = [latitude, longitude];
+          setCurrentPosition(newPosition);
+          handlePositionChange(newPosition);
         },
         (error) => console.error("Erro ao capturar a localização:", error),
         { enableHighAccuracy: true }
@@ -27,7 +28,8 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
     } else {
       console.error("Geolocalização não é suportada por este navegador.");
     }
-  }, [setRouteInfo]);
+  }, [isWalkingStarted, routeInfo.end]);
+  
 
       // Inicia a contagem do tempo e rastreamento da distância
       useEffect(() => {
@@ -69,11 +71,25 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
   };
 
   const handlePositionChange = (newPosition) => {
-    if (isWalkingStarted) {
-        updateDistance(newPosition);
-      }
-  };
+  if (isWalkingStarted) {
+    updateDistance(newPosition);
 
+    // Verifica se está perto ou chegou ao destino
+    const destination = routeInfo.end;
+    if (destination) {
+      const distanceToDestination = calculateDistance(newPosition, destination);
+
+      if (distanceToDestination < 10) { // Menos de 10 metros: destino alcançado
+        speak("Você chegou ao seu destino.");
+        setIsWalkingStarted(false); // Para o cronômetro
+      } else if (distanceToDestination < 50) { // Entre 10 e 50 metros: perto do destino
+        speak("Você está quase chegando ao seu destino.");
+      }
+    }
+  }
+};
+
+  
   return (
     <div className="home-screen">
       <header>
