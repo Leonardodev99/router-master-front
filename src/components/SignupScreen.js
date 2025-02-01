@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/SignupScreen.css";
 
-function SignupScreen({ onSignup }) {
+function SignupScreen() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -9,7 +11,7 @@ function SignupScreen({ onSignup }) {
   const handleSignup = (e) => {
     e.preventDefault();
     if (password === confirmPassword) {
-      onSignup();
+      navigate("/home");
     } else {
       alert("As senhas não coincidem!");
     }

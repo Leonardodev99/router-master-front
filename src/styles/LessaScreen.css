@@ -1,0 +1,92 @@
+.lessa-screen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #f0f8ff; /* Um azul bem claro */
+  }
+  
+  .lessa-header {
+    padding: 20px;
+    background-color: #4682b4; /* Um azul mais escuro */
+    color: white;
+    text-align: center;
+  }
+  
+  .lessa-messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .lessa-message {
+    padding: 10px 15px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+    max-width: 70%;
+  }
+  
+  .user {
+      background-color: #dcf8c6; /* verde clarinho */
+    align-self: flex-end;
+  }
+  
+  .bot {
+      background-color: #e6f7ff; /* Um azul mais clarinho */
+    align-self: flex-start;
+     color: #0056b3; /* Azul mais escuro */
+  }
+  
+  
+  .lessa-input {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    background-color: #e0e0e0;
+  }
+  
+  .lessa-input input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    margin-left: 10px;
+  }
+  
+  .lessa-input button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background-color: #4682b4; /* Azul */
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+      margin-left: 10px;
+  }
+  
+  .lessa-input button:hover {
+    background-color: #0056b3;
+  }
+  
+  
+  .voice-button{
+      padding: 10px;
+      border: none;
+      border-radius: 50%;
+      background-color: #4682b4; /* Azul */
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-right: 10px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+  }
+  
+  .voice-button:hover{
+         background-color: #0056b3;
+  }

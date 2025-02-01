@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Map from "./Map";
+/*import AddFriendScreen from "./AddFriendScreen";
+import ChatScreen from "./ChatScreen";
+import WeatherScreen from "./WeatherScreen";*/
+import { useNavigate } from "react-router-dom";
 import "../styles/HomeScreen.css";
 
 function HomeScreen({ routeInfo, setRouteInfo }) {
+  const navigate = useNavigate(); // Usando React Router para navegação
   const [showTransportOptions, setShowTransportOptions] = useState(false); // Controla exibição da caixa de diálogo
   const [selectedTransport, setSelectedTransport] = useState(""); // Armazena o transporte selecionado
   const [isWalkingStarted, setIsWalkingStarted] = useState(false); // Controla se a caminhada foi iniciada
@@ -10,9 +15,9 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
   const [walkingTime, setWalkingTime] = useState(0); // Tempo de caminhada
   const [distanceTravelled, setDistanceTravelled] = useState(0); // Distância percorrida
   const [lastPosition, setLastPosition] = useState(null); // Última posição registrada para calculo de distância
+  
   // Captura a posição atual automaticamente ao carregar o componente
   
-
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.watchPosition(
@@ -88,12 +93,17 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
     }
   }
 };
-
-  
+ 
   return (
     <div className="home-screen">
-      <header>
+       <header>
         <h1>Selecione o seu destino</h1>
+        <nav className="menu-bar">
+        <button onClick={() => navigate("/add-friend")}>Adicionar Amigo</button>
+          <button onClick={() => navigate("/chat")}>Chat</button>
+          <button onClick={() => navigate("/weather")}>Meteorologia</button>
+          <button onClick={() => navigate("/login")}>Terminar Sessão</button>
+        </nav>
       </header>
 
       {/* Renderiza o mapa e só permite escolher o destino */}

@@ -1,64 +1,45 @@
 import React, { useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoadingScreen from "./components/LoadingScreen";
 import LoginScreen from "./components/LoginScreen";
-import HomeScreen from "./components/HomeScreen";
 import SignupScreen from "./components/SignupScreen";
 import RecoverAccountScreen from "./components/RecoverAccountScreen";
+import HomeScreen from "./components/HomeScreen";
+import AddFriendScreen from "./components/AddFriendScreen";
+import ChatScreen from "./components/ChatScreen";
+import WeatherScreen from "./components/WeatherScreen"; // Importa a tela de Meteorologia
 
 function App() {
   const [routeInfo, setRouteInfo] = useState({
-    start: null, // Inicializa como null, pois será selecionado pelo usuário
-    end: null,   // Inicializa como null, pois será selecionado pelo usuário
-    mode: "pedestrian", // Modo padrão
+    start: null,
+    end: null,
+    mode: "pedestrian",
   });
-  
-  const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentScreen, setCurrentScreen] = useState("login");
 
-  // Função chamada quando a tela de carregamento finaliza
-  const handleLoaded = () => {
-    setIsLoading(false);
-  };
-
-  // Função chamada quando o login for bem-sucedido
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
-  const handleSignup = () => {
-    setCurrentScreen("login");
-  }
 
   return (
-    <div className="App">
-      {/* Tela de carregamento */}
-      {isLoading ? (
-        <LoadingScreen onLoaded={handleLoaded} />
-      ) : currentScreen === "login" && !isLoggedIn ? (
-        <LoginScreen 
-        onLogin={handleLogin}
-        onNavigateToSignup={() => setCurrentScreen('signup')}
-        onNavigateToRecover={() => setCurrentScreen("recover")} 
-        />
-      ) : currentScreen === "signup" ? (
-        <SignupScreen onSignup={handleSignup}/>
-      ) : currentScreen === "recover" ? (
-        <RecoverAccountScreen onRecover={(email) => alert(`Instruções enviadas para: ${email}`)}/>
-      ): (
-        /* Tela principal após o login */
-        <div>
-          <HomeScreen routeInfo={routeInfo} setRouteInfo={setRouteInfo} />
-          {/* Exibe as coordenadas de origem e destino depois que o usuário as selecionar */}
-          {routeInfo.start && routeInfo.end && (
-            <div>
-              <h2>Origem: {routeInfo.start.join(", ")}</h2>
-              <h2>Destino: {routeInfo.end.join(", ")}</h2>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+    <BrowserRouter>
+          <Routes>
+             {/* Tela de carregamento inicial */}
+            <Route path="/" element={<LoadingScreen />} />
+
+             {/* Telas de autenticação */}
+            <Route path="/login" element={<LoginScreen />}/>
+            <Route path="/signup" element={<SignupScreen />} />
+            <Route path="/recover" element={<RecoverAccountScreen />} />
+
+            {/* Tela principal e subpáginas */}
+            <Route path="/home" element={<HomeScreen routeInfo={routeInfo} setRouteInfo={setRouteInfo} />} />
+            <Route path="/add-friend" element={<AddFriendScreen />} />
+            <Route path="/chat" element={<ChatScreen />} />
+            <Route path="/weather" element={<WeatherScreen />} />
+
+            {/* Redireciona qualquer rota inválida para a tela de carregamento */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        
+      
+    </BrowserRouter>
   );
 }
 

@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "../assets/logorm.jpg";
 import "../styles/LoadingScreen.css";
 
-function LoadingScreen({ onLoaded }) {
-  const [loading, setLoading] = useState(true);
+function LoadingScreen() {
+  const navigate = useNavigate();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      setLoading(false);
-      onLoaded();
+      navigate('/login');
     }, 3000); // Simula carregamento por 3 segundos
     return () => clearTimeout(timer);
-  }, [onLoaded]);
+  }, [navigate]);
 
   return (
     <div className="loading-screen">
-      {loading && (
         <div className="loader">
           <img src={logo} alt="App Logo" className="logo" />
           <p>Carregando...</p>
         </div>
-      )}
     </div>
   );
 }

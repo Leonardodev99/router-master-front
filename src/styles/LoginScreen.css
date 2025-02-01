@@ -4,7 +4,7 @@
   align-items: center;
   height: 100vh;
   background-color: #1d3557;
-  color: white;
+  color: #1d3557;
 }
 
 form {
@@ -14,6 +14,9 @@ form {
   background-color: #f1faee;
   padding: 30px;
   border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 2.0);
+  width: 100%;
+  max-width: 350px;
 }
 
 input, button {
@@ -27,6 +30,11 @@ button {
   background-color: #457b9d;
   color: white;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background-color: #1d3557;
 }
 
 .additional-options {
@@ -43,4 +51,11 @@ button {
 
 .additional-options a:hover {
   text-decoration: underline;
+}
+
+/* Mensagem de erro */
+.error-message {
+  color: red;
+  font-size: 14px;
+  text-align: center;
 }
