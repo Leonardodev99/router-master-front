@@ -87,17 +87,6 @@ function Map({ setRouteInfo, isWalkingStarted, onPositionChange, currentPosition
     return null;
   }
 
-  // Atualiza `routeInfo` e a rota quando a origem e o destino são definidos
- /* useEffect(() => {
-    if (markers.start && markers.end) {
-      setRouteInfo({ start: markers.start, end: markers.end });
-       // Cria uma rota com mais pontos usando a função `createRoute`
-       const detailedRoute = createRoute(markers.start, markers.end, 100); // 100 pontos na rota
-       setPolyline(detailedRoute);
-       setRouteIndex(0); // Reseta o índice ao criar uma nova rota
-    }
-  }, [markers, setRouteInfo]);*/
-
   // Atualiza a rota quando origem e destino são definidos
   useEffect(() => {
     if (markers.start && markers.end) {

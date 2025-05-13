@@ -1,0 +1,216 @@
+/* Importar uma fonte do Google Fonts (opcional, mas recomendado) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+:root {
+  --primary-color: #007bff; /* Azul principal */
+  --primary-color-darker: #0056b3;
+  --text-color-light: #ffffff;
+  --text-color-dark: #333333;
+  --text-color-muted: #555555;
+  --background-color: #f4f7f6; /* Um cinza um pouco mais suave */
+  --card-background: #ffffff;
+  --border-radius-sm: 5px;
+  --border-radius-md: 10px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra mais suave */
+}
+
+.profile-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--background-color);
+  font-family: 'Inter', Arial, sans-serif;
+  color: var(--text-color-dark);
+}
+
+/* ... (header e back-button styles permanecem os mesmos) ... */
+.profile-screen header {
+  width: 100%;
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-screen header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.back-button {
+  background-color: transparent;
+  color: var(--text-color-light);
+  border: 1px solid var(--text-color-light);
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.back-button:hover,
+.back-button:focus {
+  background-color: var(--text-color-light);
+  color: var(--primary-color);
+  outline: none;
+}
+
+
+.profile-content {
+  margin-top: 2.5rem;
+  margin-bottom: 2rem;
+  background-color: var(--card-background);
+  padding: 2.5rem;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow);
+  width: 90%;
+  max-width: 550px;
+  text-align: center; /* Mantém o avatar e o H2 (se não tivesse seu próprio text-align) centralizados */
+}
+
+.profile-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #e0e0e0;
+  margin: 0 auto 1.5rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 3px solid var(--primary-color);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-avatar-placeholder {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+/* MODIFICAÇÕES PRINCIPAIS AQUI */
+.profile-info {
+  /* text-align: left; */ /* REMOVA ou comente esta linha */
+  display: flex;          /* ADICIONE: Torna .profile-info um container flex */
+  flex-direction: column; /* ADICIONE: Organiza os filhos (h2, p) em coluna */
+  align-items: center;    /* ADICIONE: Centraliza os filhos (h2, p) horizontalmente */
+}
+
+.profile-info h2 {
+  margin: 0 0 1.5rem;
+  color: var(--text-color-dark);
+  font-size: 2rem;
+  font-weight: 700;
+  /* text-align: center; Esta linha não é mais estritamente necessária,
+                       pois align-items: center no pai já centraliza o h2.
+                       Mas pode ser mantida, não causa problemas. */
+}
+
+.profile-info p {
+  margin: 0.8rem 0;
+  font-size: 1rem;
+  color: var(--text-color-muted);
+  display: flex;        /* Mantém: para alinhar ícone, strong e valor na mesma linha */
+  align-items: center;  /* Mantém: para alinhamento vertical dentro do <p> */
+  text-align: left;     /* ADICIONE/GARANTA: Para que o conteúdo DENTRO do <p> (ex: "E-mail: texto")
+                                          seja alinhado à esquerda, mesmo que o bloco <p> esteja centralizado. */
+  /* width: fit-content;  Opcional: Se quiser que o <p> se ajuste ao conteúdo.
+                          Com align-items: center no pai, isso já deve acontecer. */
+}
+
+.profile-info p strong {
+  color: var(--text-color-dark);
+  font-weight: 500;
+  min-width: 50px; /* Este valor (80px) pode precisar de ajuste. */
+                   /* Para alinhar os valores (ex: o email e o telefone), este min-width
+                      deve ser grande o suficiente para o label mais longo (ex: "Data de Cadastro:").
+                      Se "Telefone:" for seu label mais longo e tiver, digamos, 70px de largura,
+                      um min-width de 80px ou 90px alinharia os dois-pontos.
+                      Considere adicionar um margin-right ao strong para espaçar o label do valor. */
+  margin-right: 0.5em; /* ADICIONADO: Pequeno espaço entre o "Label:" e o "Valor" */
+  display: inline-block; /* Mantém: para min-width ter efeito */
+}
+
+.info-icon {
+  margin-right: 0.75rem;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  flex-shrink: 0; /* Para o ícone não encolher se o espaço for limitado */
+}
+
+/* ... (seu CSS existente acima) ... */
+
+.profile-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem; /* Espaço entre os botões */
+  justify-content: center; /* Centraliza os botões se houver espaço */
+}
+
+.profile-actions button {
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-sm);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.edit-button, .save-button {
+  background-color: var(--primary-color);
+  color: var(--text-color-light);
+}
+
+.edit-button:hover, .save-button:hover {
+  background-color: var(--primary-color-darker);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cancel-button {
+  background-color: #6c757d; /* Cinza para cancelar */
+  color: var(--text-color-light);
+}
+
+.cancel-button:hover {
+  background-color: #5a6268;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Estilos para o formulário de edição */
+.profile-form label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color-dark);
+  text-align: left; /* Alinha labels à esquerda */
+}
+
+.profile-form input[type="text"],
+.profile-form input[type="email"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius-sm);
+  font-size: 1rem;
+  box-sizing: border-box; /* Garante que padding não aumente a largura total */
+}
+
+.profile-form input[type="text"]:focus,
+.profile-form input[type="email"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}

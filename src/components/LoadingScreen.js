@@ -17,7 +17,7 @@ function LoadingScreen() {
     <div className="loading-screen">
         <div className="loader">
           <img src={logo} alt="App Logo" className="logo" />
-          <p>Carregando...</p>
+          <p>Route Master : A escolha segura para as suas viagens </p>
         </div>
     </div>
   );

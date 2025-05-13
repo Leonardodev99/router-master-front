@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Map from "./Map";
 /*import AddFriendScreen from "./AddFriendScreen";
 import ChatScreen from "./ChatScreen";
@@ -14,6 +14,8 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
   const [currentPosition, setCurrentPosition] = useState(null); // Posição de origem (capturada automaticamente)
   const [walkingTime, setWalkingTime] = useState(0); // Tempo de caminhada
   const [distanceTravelled, setDistanceTravelled] = useState(0); // Distância percorrida
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const profileMenuRef = useRef(null); 
   const [lastPosition, setLastPosition] = useState(null); // Última posição registrada para calculo de distância
   
   // Captura a posição atual automaticamente ao carregar o componente
@@ -47,6 +49,25 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
         }
         return () => clearInterval(intervalId); // Limpa o intervalo ao desmontar
       }, [isWalkingStarted]);
+
+      // Handle closing profile menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
+        setIsProfileMenuOpen(false);
+      }
+    }
+    // Bind the event listener only when the menu is open
+    if (isProfileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    // Cleanup function to remove listener on unmount or when menu closes
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isProfileMenuOpen]);
 
   // Função para iniciar a caminhada
   const startWalking = () => {
@@ -93,16 +114,57 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
     }
   }
 };
+
+
+ // Function to handle logout (add your actual logout logic here)
+ const handleLogout = () => {
+  console.log("Terminar Sessão clicado");
+  // Add actual logout logic (e.g., clear tokens, reset state)
+  setIsProfileMenuOpen(false); // Close menu
+  navigate("/login"); // Redirect to login page
+};
  
   return (
     <div className="home-screen">
        <header>
         <h1>Selecione o seu destino</h1>
         <nav className="menu-bar">
-        <button onClick={() => navigate("/add-friend")}>Adicionar Amigo</button>
-          <button onClick={() => navigate("/chat")}>Chat</button>
-          <button onClick={() => navigate("/weather")}>Meteorologia</button>
-          <button onClick={() => navigate("/login")}>Terminar Sessão</button>
+          {/* --- Navigation Links --- */}
+          <span className="menu-link" onClick={() => navigate("/add-friend")}>
+            Adicionar Amigo
+          </span>
+          <span className="menu-link" onClick={() => navigate("/chat")}>
+            Chat
+          </span>
+          <span className="menu-link" onClick={() => navigate("/weather")}>
+            Meteorologia
+          </span>
+
+          {/* --- Profile Menu Dropdown --- */}
+          <div className="profile-menu-container" ref={profileMenuRef}>
+            <span className="menu-link" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}>
+              Perfil ▾ {/* Down arrow indicator */}
+            </span>
+            {isProfileMenuOpen && (
+              <div className="profile-menu">
+                <span
+                  className="profile-menu-item"
+                  onClick={() => {
+                    navigate('/profile'); 
+                    setIsProfileMenuOpen(false); 
+                  }}
+                >
+                  Ver Perfil
+                </span>
+                <span
+                  className="profile-menu-item"
+                  onClick={() => navigate("/login")}
+                >
+                  Terminar Sessão
+                </span>
+              </div>
+            )}
+          </div>
         </nav>
       </header>
 

@@ -20,7 +20,7 @@ function AddFriendScreen() {
 
   const validateContact = (input) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const phoneRegex = /^\+?[0-9]{7,15}$/; // Aceita números de telefone com ou sem código do país
+    const phoneRegex = /^\+?[0-9]{7,15}$/; 
     return emailRegex.test(input) || phoneRegex.test(input);
   };
 
