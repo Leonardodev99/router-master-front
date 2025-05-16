@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/RecoverAccountScreen.css";
+import axios from "axios";
 
 function RecoverAccountScreen() {
   const navigate = useNavigate();
@@ -9,26 +10,26 @@ function RecoverAccountScreen() {
   const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [step, setStep] = useState(1); // Controla o fluxo
+  const [step, setStep] = useState(1);
 
-  // Enviar código de recuperação
-  const handleEmailSubmit = (e) => {
+  const apiUrl = "http://localhost:3005/password-recovery";
+
+  const handleEmailSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
 
-    if (!email) {
-      setError("Por favor, insira seu e-mail!");
-      return;
-    }
+    try {
+      const res = await axios.post(`${apiUrl}/request-reset`, { email });
 
-    setTimeout(() => {
-      setMessage("Verifique seu e-mail e insira o código de recuperação.");
+      setMessage(res.data.message || "Verifique seu e-mail.");
       setStep(2);
-    }, 1500);
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || "Erro ao enviar e-mail.";
+      setError(errorMsg);
+    }
   };
 
-  // Verificar código
   const handleCodeSubmit = (e) => {
     e.preventDefault();
     setError("");
@@ -39,27 +40,32 @@ function RecoverAccountScreen() {
       return;
     }
 
-    setTimeout(() => {
-      setMessage("Código verificado com sucesso! Agora redefina sua senha.");
-      setStep(3);
-    }, 1500);
+    // Apenas avança para a próxima etapa, a verificação real acontece na próxima requisição
+    setMessage("Código verificado com sucesso. Agora redefina sua senha.");
+    setStep(3);
   };
 
-  // Redefinir senha
-  const handleResetPassword = (e) => {
+  const handleResetPassword = async (e) => {
     e.preventDefault();
     setError("");
     setMessage("");
 
-    if (!newPassword) {
-      setError("Por favor, insira uma nova senha!");
-      return;
-    }
+    try {
+      const res = await axios.post(`${apiUrl}/reset-password`, {
+        email,
+        token: code,
+        newPassword,
+      });
 
-    setTimeout(() => {
-      setMessage("Senha redefinida com sucesso! Redirecionando...");
-      setTimeout(() => navigate("/login"), 2000);
-    }, 1500);
+      setMessage(res.data.message || "Senha redefinida com sucesso!");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || "Erro ao redefinir senha.";
+      setError(errorMsg);
+    }
   };
 
   return (
@@ -85,7 +91,7 @@ function RecoverAccountScreen() {
         {step === 2 && (
           <form onSubmit={handleCodeSubmit}>
             <h2>Verificar Código</h2>
-            <p>Insira o código de recuperação enviado ao seu e-mail.</p>
+            <p>Insira o código enviado ao seu e-mail.</p>
             {error && <p className="error-message">{error}</p>}
             {message && <p className="success-message">{message}</p>}
             <input

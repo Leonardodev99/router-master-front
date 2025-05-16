@@ -4,7 +4,7 @@
     align-items: center;
     height: 100vh;
     background-color: #1d3557;
-    color: white;
+    color: gray;
   }
   
   form {
@@ -32,4 +32,14 @@
   button:hover {
     background-color: #1d3557;
   }
+
+  .error-messages {
+    background-color: #ffe6e6;
+    color: #b00020;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    list-style-type: none;
+  }
+  
   

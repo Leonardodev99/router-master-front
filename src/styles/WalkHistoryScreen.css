@@ -1,0 +1,19 @@
+.walk-history-screen {
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+  .walk-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .walk-item {
+    border: 1px solid #ddd;
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    background-color: #f9f9f9;
+  }
+  

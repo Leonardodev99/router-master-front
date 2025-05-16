@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Map from "./Map";
-/*import AddFriendScreen from "./AddFriendScreen";
-import ChatScreen from "./ChatScreen";
-import WeatherScreen from "./WeatherScreen";*/
+import api from "./api";
 import { useNavigate } from "react-router-dom";
 import "../styles/HomeScreen.css";
 
@@ -69,6 +67,35 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
     };
   }, [isProfileMenuOpen]);
 
+  const registerWalk = async () => {
+    if (!routeInfo.start || !routeInfo.end || !selectedTransport) return;
+  
+    const walkData = {
+      origin: { lat: routeInfo.start[0], lng: routeInfo.start[1] },
+      destination: { lat: routeInfo.end[0], lng: routeInfo.end[1] },
+      transport_way: mapTransport(selectedTransport),
+    };
+    console.log("Dados enviados:", walkData);
+  
+    try {
+      const response = await api.post("/walks", walkData);
+      console.log("Caminhada registrada com sucesso:", response.data);
+    } catch (error) {
+      console.error("Erro ao registrar caminhada:", error.response?.data || error.message);
+    }
+  };
+  
+  const mapTransport = (transport) => {
+    switch (transport) {
+      case "walking": return "byFoot";
+      case "car": return "car";
+      case "motorbike": return "motobike";
+      case "cycling": return "bike";
+      default: return "byFoot";
+    }
+  };
+  
+
   // Função para iniciar a caminhada
   const startWalking = () => {
     if (selectedTransport && currentPosition) {
@@ -108,6 +135,7 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
       if (distanceToDestination < 10) { // Menos de 10 metros: destino alcançado
         speak("Você chegou ao seu destino.");
         setIsWalkingStarted(false); // Para o cronômetro
+        registerWalk();
       } else if (distanceToDestination < 50) { // Entre 10 e 50 metros: perto do destino
         speak("Você está quase chegando ao seu destino.");
       }
@@ -130,6 +158,9 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
         <h1>Selecione o seu destino</h1>
         <nav className="menu-bar">
           {/* --- Navigation Links --- */}
+          <span className="menu-link" onClick={() => navigate("/hostory")}>
+            Minhas corridas
+          </span>
           <span className="menu-link" onClick={() => navigate("/add-friend")}>
             Adicionar Amigo
           </span>

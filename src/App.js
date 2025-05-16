@@ -9,6 +9,7 @@ import AddFriendScreen from "./components/AddFriendScreen";
 import ChatScreen from "./components/ChatScreen";
 import WeatherScreen from "./components/WeatherScreen"; 
 import ProfileScreen from "./components/ProfileScreen";
+import WalkHistoryScreen from "./components/WalkHistoryScreen";
 
 function App() {
   const [routeInfo, setRouteInfo] = useState({
@@ -35,6 +36,7 @@ function App() {
             <Route path="/chat" element={<ChatScreen />} />
             <Route path="/weather" element={<WeatherScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />
+            <Route path="/hostory" element={<WalkHistoryScreen />} />
 
             {/* Redireciona qualquer rota inválida para a tela de carregamento */}
             <Route path="*" element={<Navigate to="/" />} />

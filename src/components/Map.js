@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Polyline, useMapEvents } from "react-leaflet";
 import L from "leaflet";
+import "leaflet.heat";
 import "leaflet/dist/leaflet.css";
 import "../styles/Map.css";
 import axios from "axios"; // Para chamadas HTTP
