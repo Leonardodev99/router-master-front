@@ -1,50 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import LessaScreen from "./LessaScreen";
+import api from "./api"; // 🔐 Axios com token
+import { useNavigate } from "react-router-dom";
 import "../styles/ChatScreen.css";
-
-const friendsList = [
-    "Assistente virtual - Lessa",
-    "João",
-    "Maria",
-    "Carlos",
-    "Ana",
-    "Pedro",
-  ];
 
 function ChatScreen() {
   const [selectedFriend, setSelectedFriend] = useState(null);  
   const [messages, setMessages] = useState({});
   const [input, setInput] = useState("");
+  const [friendsList, setFriendsList] = useState([]);
+  const navigate = useNavigate();
+
+  // 🔄 Buscar contatos reais do backend
+  useEffect(() => {
+    const fetchContacts = async () => {
+      try {
+        const response = await api.get("/contacts");
+        const usernames = response.data.map(c => c.contact.username);
+        setFriendsList(["Assistente virtual - Lessa", ...usernames]);
+      } catch (err) {
+        console.error("Erro ao carregar contatos:", err);
+        if (err.response?.status === 401) navigate("/login");
+        else setFriendsList(["Assistente virtual - Lessa"]);
+      }
+    };
+    fetchContacts();
+  }, [navigate]);
 
   const handleFriendClick = (friend) => {
     if (friend === "Assistente virtual - Lessa") {
-        setSelectedFriend("lessa"); // Define um valor especial para indicar que a Lessa foi selecionada
+      setSelectedFriend("lessa");
     } else {
-        setSelectedFriend(friend);
+      setSelectedFriend(friend);
     }
-};
-  
+  };
+
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (input.trim() && selectedFriend) {
-      setMessages((prevMessages) => {
-        const newMessages = { ...prevMessages };
-        newMessages[selectedFriend] = [
-          ...(newMessages[selectedFriend] || []),
-          { text: input, sender: "user" },
-        ];
-        return newMessages;
-      });
+      setMessages((prev) => ({
+        ...prev,
+        [selectedFriend]: [...(prev[selectedFriend] || []), { text: input, sender: "user" }],
+      }));
       setInput("");
       setTimeout(() => {
-        setMessages((prevMessages) => {
-          const newMessages = { ...prevMessages };
-          newMessages[selectedFriend] = [
-            ...(newMessages[selectedFriend] || []),
-            { text: "Resposta automática", sender: "bot" },
-          ];
-          return newMessages;
-        });
+        setMessages((prev) => ({
+          ...prev,
+          [selectedFriend]: [...(prev[selectedFriend] || []), { text: "Resposta automática", sender: "bot" }],
+        }));
       }, 1000);
     }
   };
@@ -55,37 +58,13 @@ function ChatScreen() {
         (position) => {
           const { latitude, longitude } = position.coords;
           const locationMessage = `Minha localização: https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}`;
-          setMessages((prevMessages) => {
-            const newMessages = { ...prevMessages };
-            newMessages[selectedFriend] = [
-              ...(newMessages[selectedFriend] || []),
-              { text: "Compartilhando localização...", sender: "user" },
-            ];
-            return newMessages;
-          });
-          
-          setTimeout(() => {
-            setMessages((prevMessages) => {
-              const newMessages = { ...prevMessages };
-              newMessages[selectedFriend] = [
-                ...(newMessages[selectedFriend] || []),
-                { text: locationMessage, sender: "user" },
-              ];
-              return newMessages;
-            });
-          }, 500);
-        }, 
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          const locationMessage = `Minha localização: https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}`;
-          setMessages((prevMessages) => {
-            const newMessages = { ...prevMessages };
-            newMessages[selectedFriend] = [
-              ...(newMessages[selectedFriend] || []),
+          setMessages((prev) => ({
+            ...prev,
+            [selectedFriend]: [
+              ...(prev[selectedFriend] || []),
               { text: locationMessage, sender: "user" },
-            ];
-            return newMessages;
-          });
+            ],
+          }));
         },
         (error) => {
           console.error("Erro ao obter localização:", error);
@@ -137,4 +116,3 @@ function ChatScreen() {
 }
 
 export default ChatScreen;
-

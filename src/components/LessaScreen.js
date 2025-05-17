@@ -9,7 +9,7 @@ function LessaScreen() {
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef(null);
     const audioRef = useRef(new Audio());
-    const API_KEY = "sk_5c8495dacb90e2a304ccdbe081ea5c2e06ead0e4fa0701a1"; // 🔴 Substitua pela sua chave da ElevenLabs
+    const API_KEY = "sk_5c8495dacb90e2a304ccdbe081ea5c2e06ead0e4fa0701a1"; // 🔴 API da chave da ElevenLabs
 
     useEffect(() => {
         if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
@@ -60,6 +60,7 @@ function LessaScreen() {
     const fetchResponse = async (question) => {
         const responseMap = {
             "olá lessa.": "Olá! Como posso ajudar você hoje?",
+            "ola": "olá! tudo bem",
             "como você está?": "Eu estou bem, obrigada por perguntar!",
             "qual seu nome?": "Meu nome é Lessa, sua assistente virtual.",
             "tchau": "Até a próxima! Se precisar de algo, estarei aqui.",
