@@ -1,22 +1,25 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import LessaScreen from "./LessaScreen";
-import api from "./api"; // 🔐 Axios com token
+import api from "./api";
 import { useNavigate } from "react-router-dom";
+import { io } from "socket.io-client";
 import "../styles/ChatScreen.css";
 
 function ChatScreen() {
-  const [selectedFriend, setSelectedFriend] = useState(null);  
+  const [selectedFriend, setSelectedFriend] = useState(null);
   const [messages, setMessages] = useState({});
   const [input, setInput] = useState("");
   const [friendsList, setFriendsList] = useState([]);
+  const [socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
   const navigate = useNavigate();
 
-  // 🔄 Buscar contatos reais do backend
+  // Carregar contatos
   useEffect(() => {
     const fetchContacts = async () => {
       try {
         const response = await api.get("/contacts");
-        const usernames = response.data.map(c => c.contact.username);
+        const usernames = response.data.map((c) => c.contact.username);
         setFriendsList(["Assistente virtual - Lessa", ...usernames]);
       } catch (err) {
         console.error("Erro ao carregar contatos:", err);
@@ -27,37 +30,75 @@ function ChatScreen() {
     fetchContacts();
   }, [navigate]);
 
-  const handleFriendClick = (friend) => {
+  // Conectar WebSocket
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const newSocket = io("http://localhost:3005", {
+      auth: { token },
+    });
+
+    newSocket.on("receive_message", ({ sender, text }) => {
+      setMessages((prev) => ({
+        ...prev,
+        [sender]: [...(prev[sender] || []), { text, sender: "friend" }],
+      }));
+    });
+
+    setSocket(newSocket);
+    socketRef.current = newSocket;
+
+    return () => newSocket.disconnect();
+  }, []);
+
+  // Selecionar amigo e buscar histórico
+  const handleFriendClick = async (friend) => {
     if (friend === "Assistente virtual - Lessa") {
       setSelectedFriend("lessa");
-    } else {
+      return;
+    }
+
+    try {
+      const response = await api.get(`/messages/${friend}`);
+      const chatHistory = response.data.map((msg) => ({
+        text: msg.text,
+        sender: msg.sender_id === getCurrentUserId() ? "user" : "friend",
+      }));
+
+      setMessages((prev) => ({
+        ...prev,
+        [friend]: chatHistory,
+      }));
+
       setSelectedFriend(friend);
+    } catch (err) {
+      console.error("Erro ao buscar histórico de mensagens:", err);
     }
   };
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (input.trim() && selectedFriend) {
-      setMessages((prev) => ({
-        ...prev,
-        [selectedFriend]: [...(prev[selectedFriend] || []), { text: input, sender: "user" }],
-      }));
-      setInput("");
-      setTimeout(() => {
-        setMessages((prev) => ({
-          ...prev,
-          [selectedFriend]: [...(prev[selectedFriend] || []), { text: "Resposta automática", sender: "bot" }],
-        }));
-      }, 1000);
-    }
+    if (!input.trim() || !selectedFriend || !socket) return;
+
+    setMessages((prev) => ({
+      ...prev,
+      [selectedFriend]: [...(prev[selectedFriend] || []), { text: input, sender: "user" }],
+    }));
+
+    socket.emit("send_message", {
+      recipient: selectedFriend,
+      text: input,
+    });
+
+    setInput("");
   };
 
   const shareLocation = () => {
-    if (navigator.geolocation && selectedFriend) {
+    if (navigator.geolocation && selectedFriend && socket) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           const locationMessage = `Minha localização: https://www.openstreetmap.org/?mlat=${latitude}&mlon=${longitude}`;
+
           setMessages((prev) => ({
             ...prev,
             [selectedFriend]: [
@@ -65,11 +106,27 @@ function ChatScreen() {
               { text: locationMessage, sender: "user" },
             ],
           }));
+
+          socket.emit("send_message", {
+            recipient: selectedFriend,
+            text: locationMessage,
+          });
         },
         (error) => {
           console.error("Erro ao obter localização:", error);
         }
       );
+    }
+  };
+
+  const getCurrentUserId = () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return null;
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      return payload.id;
+    } catch (err) {
+      return null;
     }
   };
 
