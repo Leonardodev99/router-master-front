@@ -158,6 +158,9 @@ function HomeScreen({ routeInfo, setRouteInfo }) {
         <h1>Selecione o seu destino</h1>
         <nav className="menu-bar">
           {/* --- Navigation Links --- */}
+          <span className="menu-link" onClick={() => navigate("/SeeTraffic")}>
+            Ver Trânsito
+          </span>
           <span className="menu-link" onClick={() => navigate("/hostory")}>
             Minhas corridas
           </span>

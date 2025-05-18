@@ -1,0 +1,42 @@
+.traffic-map-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-container {
+  flex: 1;
+  width: 100%;
+}
+.traffic-ui {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  margin-bottom: 10px;
+}
+
+.legend, .history {
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  box-shadow: 0 0 4px rgba(0,0,0,0.1);
+  max-width: 45%;
+}
+
+.legend .dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.legend .green { background: green; }
+.legend .yellow { background: orange; }
+.legend .red { background: red; }
+
+.history ul {
+  padding-left: 18px;
+  margin: 0;
+}
