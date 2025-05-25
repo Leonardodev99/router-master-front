@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet.heat";
-import "../styles/TrafficMapScreen.css"; // ✅ para estilos da legenda/histórico
+import "../styles/TrafficMapScreen.css"; 
 
 const basePoints = [
   [-8.8383, 13.2344],

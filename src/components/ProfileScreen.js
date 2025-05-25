@@ -23,7 +23,8 @@ function ProfileScreen() {
           name: userData.username,
           email: userData.email,
           phone: userData.phone,
-          avatarUrl: userData.photos?.url || null,
+          avatarUrl: userData.photo || null,
+
         });
       } catch (err) {
         console.error("Erro ao carregar perfil:", err);
